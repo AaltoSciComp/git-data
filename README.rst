@@ -82,3 +82,17 @@ Cleaning up old data:
 
   * ``git annex unused``
   * ``git annex dropunused all``
+
+
+Limitations
+-----------
+
+We rely on ``allas-conf`` to set up a rclone configuration that has an
+``allas`` remote defined.  This simplifies things a lot, but it could
+be that it's not available.  We will deal with that when it comes up,
+because CSC doesn't provide any other way of configuring Allas!
+
+
+See also
+--------
+* git-annex
