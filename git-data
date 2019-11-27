@@ -5,10 +5,12 @@ cmd="$1"
 shift
 
 if [[ "$cmd" = init ]] ; then
-    git init
+    test -e ./.git || git init
     git annex init
 
 elif [[ "$cmd" = clone ]] ; then
+    # Clone a repository and get ALL data.  It is probably better to
+    # "git clone" and "git data init", and get just the data you need.
     path="$1"
     shift
     dest="$1"
@@ -19,16 +21,59 @@ elif [[ "$cmd" = clone ]] ; then
     git annex init
     git annex sync
     git annex get .
+    git annex sync
 
-elif [[ "$cmd" = add ]] ; then
-    path="$1"
-    shift
+elif [[ "$cmd" = list ]] ; then
+    git annex "$cmd" "$@"
 
-    git annex add "$@"
+elif [    "$cmd" = add \
+       -o "$cmd" = get \
+       -o "$cmd" = drop ] ; then
+    git annex $cmd "$@"
+    git annex sync
+
+elif [[ "$cmd" = push ]] ; then
+    git annex copy -t allas "$@"
     git annex sync
 
 elif [[ "$cmd" = sync ]] ; then
     git annex sync
+    git annex fix
+
+elif [[ "$cmd" = allas ]] ; then
+    # Remote already exists - just enable it.
+    if git annex info | grep -- '-- allas' &>/dev/null ; then
+	git annex enableremote allas
+	exit 1
+    fi
+    # Create a new special remote
+    prefix="git-annex"
+    if [[ "$1" = "-p" ]] ; then
+	prefix="$2"
+	shift ; shift
+    fi
+    if [[ "$1" = "-t" ]] ; then
+	exporttree="exporttree=yes importtree=yes"
+	shift
+    fi
+    bucket="$1"
+    if [[ -z "$bucket" ]] ; then
+	echo "bucket must be specified"
+	exit 1
+    fi
+    shift
+    git annex initremote allas type=external externaltype=rclone \
+	$exporttree \
+        rclone_layout=lower \
+	encryption=none \
+        target=allas prefix="$bucket"/"$prefix"
+    git annex wanted allas anything
+
+elif [[ "$cmd" = _uninit ]] ; then
+    tmp=$RANDOM$RANDOM$RANDOM
+    git annex dead allas
+    git annex renameremote allas dead-allas-$tmp
+    git remote rename allas dead-allas-$tmp
 
 else
     echo "no command given"
