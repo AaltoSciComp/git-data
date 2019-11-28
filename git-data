@@ -28,7 +28,10 @@ elif [[ "$cmd" = list ]] ; then
 
 elif [    "$cmd" = add \
        -o "$cmd" = get \
-       -o "$cmd" = drop ] ; then
+       -o "$cmd" = drop \
+       -o "$cmd" = lock \
+       -o "$cmd" = unlock \
+        ] ; then
     git annex $cmd "$@"
     git annex sync
 
@@ -47,11 +50,6 @@ elif [[ "$cmd" = allas ]] ; then
 	exit 1
     fi
     # Create a new special remote
-    prefix="git-annex"
-    if [[ "$1" = "-p" ]] ; then
-	prefix="$2"
-	shift ; shift
-    fi
     if [[ "$1" = "-t" ]] ; then
 	exporttree="exporttree=yes importtree=yes"
 	shift
@@ -66,7 +64,8 @@ elif [[ "$cmd" = allas ]] ; then
 	$exporttree \
         rclone_layout=lower \
 	encryption=none \
-        target=allas prefix="$bucket"/"$prefix"
+        target=allas prefix="$bucket"
+    # chunk=50MiB
     git annex wanted allas anything
 
 elif [[ "$cmd" = _uninit ]] ; then
