@@ -1,6 +1,11 @@
 #!/bin/bash
 set -x
 
+# This is just the git remote name
+DEFAULT_REMOTE=allas
+
+_autosync () { git annex sync --no-commit "$@" ; }
+
 cmd="$1"
 shift
 
@@ -19,9 +24,9 @@ elif [[ "$cmd" = clone ]] ; then
     git clone "$path" "$dest"
     cd "$dest"
     git annex init
-    git annex sync
+    _autosync
     git annex get .
-    git annex sync
+    _autosync
 
 elif [[ "$cmd" = list ]] ; then
     git annex "$cmd" "$@"
@@ -33,23 +38,28 @@ elif [    "$cmd" = add \
        -o "$cmd" = unlock \
         ] ; then
     git annex $cmd "$@"
-    git annex sync
+    _autosync
 
 elif [[ "$cmd" = push ]] ; then
-    git annex copy -t allas "$@"
-    git annex sync
+    git annex copy -t $DEFAULT_REMOTE "$@"
+    _autosync
 
 elif [[ "$cmd" = sync ]] ; then
-    git annex sync
+    _autosync "$@"
     git annex fix
 
 elif [[ "$cmd" = allas ]] ; then
     # Remote already exists - just enable it.
-    if git annex info | grep -- '-- allas' &>/dev/null ; then
-	git annex enableremote allas
+    if git annex info | grep -- "-- $DEFAULT_REMOTE" &>/dev/null ; then
+	git annex enableremote $DEFAULT_REMOTE
 	exit 1
     fi
     # Create a new special remote
+    encryption="encryption=none"
+    if [[ "$1" = "-e" ]] ; then
+	encryption="encryption=shared"
+	shift
+    fi
     if [[ "$1" = "-t" ]] ; then
 	exporttree="exporttree=yes importtree=yes"
 	shift
@@ -60,19 +70,19 @@ elif [[ "$cmd" = allas ]] ; then
 	exit 1
     fi
     shift
-    git annex initremote allas type=external externaltype=rclone \
+    git annex initremote $DEFAULT_REMOTE type=external externaltype=rclone \
 	$exporttree \
         rclone_layout=lower \
-	encryption=none \
+	$encryption \
         target=allas prefix="$bucket"
     # chunk=50MiB
-    git annex wanted allas anything
+    git annex wanted $DEFAULT_REMOTE anything
 
 elif [[ "$cmd" = _uninit ]] ; then
     tmp=$RANDOM$RANDOM$RANDOM
-    git annex dead allas
-    git annex renameremote allas dead-allas-$tmp
-    git remote rename allas dead-allas-$tmp
+    git annex dead $DEFAULT_REMOTE
+    git annex renameremote $DEFAULT_REMOTE dead-$DEFAULT_REMOTE-$tmp
+    git remote rename $DEFAULT_REMOTE dead-$DEFAULT_REMOTE-$tmp
 
 else
     echo "no command given"
