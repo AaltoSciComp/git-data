@@ -1,19 +1,25 @@
 git-data: easy wrapper for git-annex
 ====================================
 
+git-data is a wrapper around git-annex to allow git to easily manage
+large data via an object store (and without checking the actual data
+into git, of course).  See `git-annex
+<https://git-annex.branchable.com/>`__.
+
 To successfully use an object store, one needs to manage movement of
-data.  This takes a lot of care when it is *imperative* (issue
-commands), but easier when it is *declarative* (say what data you want
-where, backend handles transfers, replication, merging).
+data.  Doing this *imperative* (issue commands for each move) is fine
+for small stuff, but the cognitive overhead becomes large once there
+is a large amount of diverse and changing data.  A *declarative* (say
+what data you want where, backend handles transfers, replication,
+merging) is needed for serious use cases.
 
-git-data is an easy wrapper for git-annex, which handles simple
-use cases easy (and doesn't get in the way of complex matters, since
-git-annex is still usable directly).
+git-data is just an easy wrapper for git-annex, which makes simple
+things easier while hard things are still possible.
 
-Currently, git-data is speciallized for Allas, a ceph-based object
+Currently, git-data is speciallized for Allas, a Ceph-based object
 store in Finland - but there is nothing special about using Allas.  In
 fact, there's not much special about git-data other than making things
-usable.
+more usable.
 
 
 
@@ -108,9 +114,10 @@ Sharing
 -------
 
 If you want to share the data with others, it is as simple as sharing
-the git repository (All the special stuff is on the special
-``git-annex`` branch - that branch encodes what is needed to get
-objects from the store.
+the git repository - the repository has enough information to retrive
+things from the object store.  (All the special stuff is on the
+special ``git-annex`` branch).  This special ``git-annex`` branch is
+synced both ways with ``git data sync``.
 
 
 
@@ -120,15 +127,14 @@ Encryption
 If the allas is initialized (the very first time) with ``-e``, then
 all objects are stored on it `encrypted
 <https://git-annex.branchable.com/encryption/>`__ client side.  This
-encryption should be considered secure.  By ``git-data`` default, it
-is "shared" encryption mode: the symmetric key is stored within the
+encryption should be considered strong and secure.  By ``git-data`` default, it
+is "shared" encryption mode: a symmetric key is stored within the
 repository itself, so anyone with a copy of the repository can access
 all data (the other option is using PGP keys, not described here).
-Thus, securely sharing data with the object store reduces the the
-problem of securely the the (small) git repository, which can be done
-via ssh access, Gitlab, etc.  If the object store credentials are not
-also embedded in the repository, then both the repository and object
-store access are needed to access the data.
+Thus, in basic usage, all you have to do is share the small git
+repository securely, which can be done with ssh, Gitlab, etc.  There
+can be a bit more security if different authentication is needed to
+access the object store itself.
 
 
 
