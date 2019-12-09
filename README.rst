@@ -53,26 +53,26 @@ Example use case
 Create new repository:
 
 * ``git init``
-* ``git data allas bucket_name[/object_prefix]`` (after ``module load allas && allas-conf``)
+* ``git data allas bucket_name[/object_prefix]`` (after ``module load
+  allas && allas-conf``).  Add ``-e`` before bucket name to enable
+  git-annex encryption (see below).
 
 Clone an existing repository and access its data:
 
 * Clone the repository like normal.
-* ``git data allas`` - re-inits existing allas link, which is stored
-  within the normal git repository - even if hosted on github or
-  non-aware services.  Add ``-e`` to enable git-annex encryption (see
-  below).
+* ``git data allas`` - re-enables new repo's Allas link.  Automatic
+  after the first time.
 
 And for daily work:
 
 * ``git data add [filenames]``: add data files.  File is moved to a
   safe place and replaced with a symlink.
-* ``git data fullsync``: commit any thing not already committed, sync
+* ``git data sync``: commit any thing not already committed, sync
   all commits and data to all reachable repositories.  *Automatically*
   use Alpha (all files everywhere) or Bravo (all files in Allas)
   strategy.
-* ``git data sync``: *automatically* sync all commits and meta data to
-  all reachable repositories.  Actual content not transferred.
+* ``git data metasync``: automatically sync all commits and meta data
+  to all reachable repositories.  Actual content not transferred.
 * ``git data push [filenames]``: push specific data files to object
   storage
 * ``git data get [filenames]``: get specific data files from object
@@ -121,7 +121,7 @@ If you want to share the data with others, it is as simple as sharing
 the git repository - the repository has enough information to retrive
 things from the object store.  (All the special stuff is on the
 special ``git-annex`` branch).  This special ``git-annex`` branch is
-synced both ways with ``git data sync``.
+synced both ways with ``git data sync`` or ``git data metasync``.
 
 
 

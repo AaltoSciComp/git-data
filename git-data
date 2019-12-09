@@ -44,11 +44,11 @@ elif [[ "$cmd" = push ]] ; then
     git annex copy -t $DEFAULT_REMOTE "$@"
     _autosync
 
-elif [[ "$cmd" = sync ]] ; then
+elif [[ "$cmd" = metasync ]] ; then
     _autosync "$@"
     git annex fix
 
-elif [[ "$cmd" = fullsync ]] ; then
+elif [[ "$cmd" = sync ]] ; then
     git annex sync --commit --content "$@"
     git annex fix
 

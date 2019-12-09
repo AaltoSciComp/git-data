@@ -38,7 +38,7 @@ ls
 git data clone ./origin ./clone1
 cd 'clone1'
 test -e file1  # "git data clone" inits and gets for you.
-git data sync
+git data metasync
 test -e file1
 # Phase 1b: clone without git-data, verify that "git data sync
 # --content" gets the data for you.
@@ -47,7 +47,7 @@ ls
 git clone ./origin ./clone2
 cd 'clone2'
 test ! -e file1  # File is *not* there yet
-git data sync --content
+git data metasync --content
 test -e file1    # File is now there
 echo
 echo "phase 1 success"
@@ -61,7 +61,7 @@ echo "$@"
 # Do the test
 cd "$tmpdir/origin"
 git data allas "$2"
-git data sync --content
+git data sync
 echo
 echo "phase 2 success"
 echo
@@ -77,10 +77,10 @@ echo 'data3b' > data3b     # normal git file
 git data add data3a
 git add data3b
 git commit -m phase3
-git data fullsync
+git data sync
 pwd ; ls -l
 cd ../origin
-git data fullsync
+git data sync
 pwd ; ls -l
 test "$(cat data3a)" = data3a   # verify both files got transferred
 test "$(cat data3b)" = data3b   # ...
