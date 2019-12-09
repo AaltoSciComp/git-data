@@ -67,8 +67,12 @@ And for daily work:
 
 * ``git data add [filenames]``: add data files.  File is moved to a
   safe place and replaced with a symlink.
-* ``git data sync --content``: *automatically* use the Alpha (all
-  files everywhere) or Bravo (all files in Allas) policies.
+* ``git data fullsync``: commit any thing not already committed, sync
+  all commits and data to all reachable repositories.  *Automatically*
+  use Alpha (all files everywhere) or Bravo (all files in Allas)
+  strategy.
+* ``git data sync``: *automatically* sync all commits and meta data to
+  all reachable repositories.  Actual content not transferred.
 * ``git data push [filenames]``: push specific data files to object
   storage
 * ``git data get [filenames]``: get specific data files from object

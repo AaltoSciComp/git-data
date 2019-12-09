@@ -48,6 +48,10 @@ elif [[ "$cmd" = sync ]] ; then
     _autosync "$@"
     git annex fix
 
+elif [[ "$cmd" = fullsync ]] ; then
+    git annex sync --commit --content "$@"
+    git annex fix
+
 elif [[ "$cmd" = allas ]] ; then
     # Remote already exists - just enable it.
     if git annex info | grep -- "-- $DEFAULT_REMOTE" &>/dev/null ; then
